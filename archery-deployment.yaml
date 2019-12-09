@@ -1,0 +1,70 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: archery
+  name: archery
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: archery
+    spec:
+      containers:
+      - command:
+        - dockerize
+        - -wait
+        - tcp://mysql:3306
+        - -wait
+        - tcp://redis:6379
+        - -timeout
+        - 60s
+        - /opt/archery/src/docker/startup.sh
+        env:
+        - name: NGINX_PORT
+          value: "9123"
+        image: hhyo/archery:1.7.2
+        name: archery
+        ports:
+        - containerPort: 9123
+        resources: {}
+        volumeMounts:
+        - mountPath: /opt/archery/archery/settings.py
+          name: archery-claim0
+        - mountPath: /etc/soar.yaml
+          name: archery-claim1
+        - mountPath: /opt/archery/docs/docs.md
+          name: archery-claim2
+        - mountPath: /opt/archery/downloads
+          name: archery-claim3
+        - mountPath: /opt/archery/sql/migrations
+          name: archery-claim4
+      restartPolicy: Always
+      volumes:
+      - name: archery-claim0
+        persistentVolumeClaim:
+          claimName: archery-claim0
+      - name: archery-claim1
+        persistentVolumeClaim:
+          claimName: archery-claim1
+      - name: archery-claim2
+        persistentVolumeClaim:
+          claimName: archery-claim2
+      - name: archery-claim3
+        persistentVolumeClaim:
+          claimName: archery-claim3
+      - name: archery-claim4
+        persistentVolumeClaim:
+          claimName: archery-claim4
+status: {}

@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: inception
+  name: inception
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: inception
+    spec:
+      containers:
+      - image: hhyo/inception
+        name: inception
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/inc.cnf
+          name: inception-claim0
+      restartPolicy: Always
+      volumes:
+      - name: inception-claim0
+        persistentVolumeClaim:
+          claimName: inception-claim0
+status: {}
